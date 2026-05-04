@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordify Video Lab</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@700&family=Permanent+Marker&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="page-shell">
+    <aside class="control-panel">
+      <div class="panel-copy">
+        <p class="eyebrow">Wordify Video Lab</p>
+        <h1>Type a few lines. Turn them into moving typography.</h1>
+        <p class="lede">
+          Words break into short phrases, land in unpredictable spots, rotate slightly, and punch in with zoom-based motion.
+        </p>
+      </div>
+
+      <label class="field">
+        <span>Script</span>
+        <textarea id="script-input" spellcheck="false">CFS is an AI powered platform to help businesses work smarter, grow faster, and automate the repetitive stuff.</textarea>
+      </label>
+
+      <div class="control-grid">
+        <label class="field compact">
+          <span>Theme</span>
+          <select id="theme-select">
+            <option value="midnight">Midnight Neon</option>
+            <option value="paper">Paper Punch</option>
+            <option value="automation">Automation Green</option>
+          </select>
+        </label>
+
+        <label class="field compact">
+          <span>Chunk Size</span>
+          <input id="chunk-size" type="range" min="1" max="4" step="1" value="3">
+        </label>
+
+        <label class="field compact">
+          <span>Pace</span>
+          <input id="pace" type="range" min="0.55" max="1.8" step="0.05" value="1">
+        </label>
+
+        <label class="field compact">
+          <span>Motion</span>
+          <input id="motion" type="range" min="0.6" max="1.6" step="0.05" value="1">
+        </label>
+
+        <label class="field compact">
+          <span>Playback</span>
+          <select id="playback-rate">
+            <option value="1">1.0x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+          </select>
+        </label>
+
+        <label class="field compact">
+          <span>Voice Mix</span>
+          <input id="voice-volume" type="range" min="0" max="1" step="0.05" value="1">
+        </label>
+      </div>
+
+      <div class="button-row">
+        <button id="play-button" class="primary">Play Preview</button>
+        <button id="restart-button">Restart</button>
+        <button id="export-button">Export WebM</button>
+      </div>
+
+      <div class="button-row split">
+        <button id="reshuffle-button">Reshuffle</button>
+        <button id="avoid-overlap-button">Avoid Overlap</button>
+        <button id="ai-arrange-button">AI Arrange</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-label">Clips</span>
+          <strong id="chunk-count">0</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Duration</span>
+          <strong id="duration">0.0s</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Status</span>
+          <strong id="status">Idle</strong>
+        </div>
+      </div>
+
+      <section class="subpanel">
+        <div class="subpanel-head">
+          <div>
+            <p class="eyebrow">Voice Over</p>
+            <h3>Audio sync and export</h3>
+          </div>
+        </div>
+
+        <label class="field compact">
+          <span>Audio File</span>
+          <input id="voiceover-file" type="file" accept="audio/*">
+        </label>
+
+        <label class="toggle-row">
+          <input id="voiceover-enabled" type="checkbox" checked>
+          <span>Include uploaded voice-over in preview and export</span>
+        </label>
+
+        <div class="stats-row two-up">
+          <div class="stat">
+            <span class="stat-label">Voice</span>
+            <strong id="voiceover-status">None</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Audio Length</span>
+            <strong id="voiceover-duration">0.0s</strong>
+          </div>
+        </div>
+
+        <audio id="voiceover-audio" controls preload="metadata"></audio>
+      </section>
+
+      <section class="subpanel">
+        <div class="subpanel-head">
+          <div>
+            <p class="eyebrow">AI Assist</p>
+            <h3>Smarter layout actions</h3>
+          </div>
+        </div>
+
+        <p class="subpanel-copy">
+          Local layout intelligence balances alignments, rotations, spacing, and emphasis without needing a server.
+        </p>
+
+        <div class="button-row split">
+          <button id="ai-balance-button">Balance Scene</button>
+          <button id="ai-align-button">Smart Align</button>
+          <button id="fit-audio-button">Fit To Audio</button>
+        </div>
+      </section>
+
+      <section class="subpanel">
+        <div class="subpanel-head">
+          <div>
+            <p class="eyebrow">Clip Inspector</p>
+            <h3>Edit the selected layer</h3>
+          </div>
+          <strong id="selected-label">No selection</strong>
+        </div>
+
+        <div id="clip-list" class="clip-list"></div>
+
+        <label class="field compact">
+          <span>Clip Text</span>
+          <input id="selected-text" type="text" placeholder="Select a clip from the canvas or list">
+        </label>
+
+        <div class="control-grid">
+          <label class="field compact">
+            <span>Size</span>
+            <input id="selected-size" type="range" min="42" max="260" step="1" value="96">
+          </label>
+
+          <label class="field compact">
+            <span>Rotation</span>
+            <input id="selected-rotation" type="range" min="-35" max="35" step="1" value="0">
+          </label>
+
+          <label class="field compact">
+            <span>X Position</span>
+            <input id="selected-x" type="range" min="0" max="1280" step="1" value="640">
+          </label>
+
+          <label class="field compact">
+            <span>Y Position</span>
+            <input id="selected-y" type="range" min="0" max="720" step="1" value="360">
+          </label>
+
+          <label class="field compact">
+            <span>Color</span>
+            <input id="selected-color" type="color" value="#ffffff">
+          </label>
+
+          <div class="field compact">
+            <span>Alignment</span>
+            <div class="segmented" id="selected-align">
+              <button type="button" data-align="left">Left</button>
+              <button type="button" data-align="center" class="active">Center</button>
+              <button type="button" data-align="right">Right</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="stage-panel">
+      <div class="stage-header">
+        <div>
+          <p class="eyebrow">Live Stage</p>
+          <h2>16:9 motion typography preview</h2>
+        </div>
+        <p class="stage-note">Drag a selected clip on the canvas to reposition it. Timeline bars and clip list stay in sync.</p>
+      </div>
+
+      <div class="stage-wrap">
+        <canvas id="preview-canvas" width="1280" height="720"></canvas>
+      </div>
+
+      <section class="timeline-panel">
+        <div class="timeline-meta">
+          <div>
+            <p class="eyebrow">Timeline</p>
+            <h3>Scene-based sequencing</h3>
+          </div>
+          <strong id="playhead-time">00:00.0 / 00:00.0</strong>
+        </div>
+
+        <input id="timeline-scrubber" class="timeline-scrubber" type="range" min="0" max="1000" step="1" value="0">
+        <div id="timeline-tracks" class="timeline-tracks"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
