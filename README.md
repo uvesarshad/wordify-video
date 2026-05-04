@@ -2,6 +2,8 @@
 
 Small browser app for building kinetic typography videos from a short script.
 
+![Wordify Video Lab Demo](public/IMG_7290.PNG)
+
 ## What it does
 
 - Breaks text into random one-to-four-word chunks
